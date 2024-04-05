@@ -1,17 +1,15 @@
-import cursor
+import sql_operation
+from models import Info
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 #uvicorn pysqlbackend:app --reload
 app = FastAPI()
 
-class info(BaseModel):
-    role:str
-    id:int
+@app.post("/getInfo/")
+def getInfo(info:Info):
+    return sql_operation.getInfo(info)
 
-@app.get("/selsect/")
-def select(info:info):
-    print("进入函数")
-    cursor.select(info.role,info.id)
+
 
          

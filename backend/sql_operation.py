@@ -1,4 +1,6 @@
 import pymssql
+from models import Info
+
 
 connect = pymssql.connect(
     server = 'ZIJING-PC',
@@ -9,9 +11,11 @@ connect = pymssql.connect(
 )
 cursor = connect.cursor()
 
-def select(role:str,id:int):
-    print("进入函数")
-    cursor.execute('select cname from category where ID = %d','1')    
+def getInfo(info:Info):
+    cursor.execute('select cname from category where ID = %d',info.id)    
     for row in cursor:
-        print('row = %s' % (row,))
         return('row = %s' % (row,))
+
+
+
+
