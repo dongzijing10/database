@@ -1,24 +1,17 @@
-import pymssql
+import cursor
 from fastapi import FastAPI
+from pydantic import BaseModel
+
 #uvicorn pysqlbackend:app --reload
 app = FastAPI()
 
-connect = pymssql.connect(
-    server = 'ZIJING-PC',
-    user = 'sa',
-    password = '19222126',
-    database = 'kechengsheji',
-    as_dict = True
-)
-cursor = connect.cursor()
+class info(BaseModel):
+    role:str
+    id:int
 
-@app.get("/selsect/{role}/{id}")
-def select(role:str,id:int):
-    cursor = connect.cursor()
-    cursor.execute('select cname from category where ID = %d','1')    
-    for row in cursor:
-        return('row = %s' % (row,))
-    
-# @app.get()
-# def insert()
+@app.get("/selsect/")
+def select(info:info):
+    print("进入函数")
+    cursor.select(info.role,info.id)
+
          
