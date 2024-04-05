@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from typing import Optional
 from pydantic import BaseModel
-
+#uvicorn main:app --reload
 app = FastAPI()
 
 class Item(BaseModel):
