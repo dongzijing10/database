@@ -14,17 +14,14 @@ class category(BaseModel):
     explain: str
     setup: datetime.date
     update: datetime.date
-    pname:str
-    pjob: str
-    cadd: str
-    city: str
+    picture: int
 
 class customers(BaseModel):
     cID: str
     cname: str
     pname: str
     pjob: str
-    cadd: str
+    caddress: str
     city: str
     area: str
     postcode: str
@@ -40,6 +37,8 @@ class orderdetail(BaseModel):
 
 class orders(BaseModel):
     ID: int
+    customerID: str
+    employeeID: int
     orderdate: datetime.date
     starttime: datetime.date
     arrivaltime: datetime.date
@@ -50,8 +49,12 @@ class orders(BaseModel):
     city: str
     area: str
     postcode: str
+    country: str
     paymethod: str
     insurance: str
+
+class pici(BaseModel):
+    ID: int
 
 class products(BaseModel):
     ID: int
@@ -64,10 +67,16 @@ class products(BaseModel):
     supplystate: bool
 
 class proinfo(BaseModel):
-    ID: int
+    piciID: int
     productID: int 
     prodate: datetime.date
     expirationdate: datetime.date
+
+class rule(BaseModel):
+    id: int
+    weight: int
+    cost: str
+    cri: str
 
 class shippers(BaseModel):
     sID: int
@@ -91,15 +100,17 @@ class suppliers(BaseModel):
 
 class insertInfo(BaseModel):
     tableName: str
-    id: int|str
     categoryInput: category   #嵌套定义类，将外面的类引用到类内部，在内部也可以嵌套，但其他的函数引用内部类时麻烦
     customersInput: customers
     orderdetailInput: orderdetail
     ordersInput: orders
+    piciInput: pici
     productsInput: products
     proinfoInput: proinfo
+    ruleInput: rule
     shippersInput: shippers
     suppliersInput: suppliers
+    
 
 
 
