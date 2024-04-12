@@ -2,104 +2,107 @@ from pydantic import BaseModel
 from typing import Optional
 import datetime 
 
-# Optional[str] = None
+# Optional[Optional[str] = None] = None
 
 class tableInfo(BaseModel):
-    tableName: str
-    id: int|str
+    tableName: Optional[str] = None
+    id: Optional[int|str] = None
+    id1: Optional[int] = None
 
 class category(BaseModel):
-    id: int|str
-    cname: str
-    explain: str
-    setup: datetime.date
-    update: datetime.date
-    picture: int
+    id: Optional[str] = None
+    cname: Optional[str] = None
+    explain: Optional[str] = None
+    setup: Optional[datetime.date] = None
+    update: Optional[datetime.date] = None 
+    picture: Optional[int] = None
 
 class customers(BaseModel):
-    cID: str
-    cname: str
-    pname: str
-    pjob: str
-    caddress: str
-    city: str
-    area: str
-    postcode: str
-    country: str
-    phone: str
-    fax: str
+    cID: Optional[str] = None
+    cname: Optional[str] = None
+    pname: Optional[str] = None
+    pjob: Optional[str] = None
+    caddress: Optional[str] = None
+    city: Optional[str] = None
+    area: Optional[str] = None
+    postcode: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    fax: Optional[str] = None
+    id: Optional[int] = None
+    password: Optional[str] = None
 
 class orderdetail(BaseModel):
-    orderid: int 
-    productid: int
-    num: int
-    remark: str
+    orderid: Optional[int] = None 
+    productid: Optional[int] = None
+    num: Optional[int] = None
+    remark: Optional[str] = None
 
 class orders(BaseModel):
-    ID: int
-    customerID: str
-    employeeID: int
-    orderdate: datetime.date
-    starttime: datetime.date
-    arrivaltime: datetime.date
-    confirmtime: datetime.date
-    cost: int
-    name: str
-    addr: str
-    city: str
-    area: str
-    postcode: str
-    country: str
-    paymethod: str
-    insurance: str
+    ID: Optional[int] = None
+    customerID: Optional[str] = None
+    employeeID: Optional[int] = None
+    orderdate: Optional[datetime.date] = None
+    starttime: Optional[datetime.date] = None
+    arrivaltime: Optional[datetime.date] = None
+    confirmtime: Optional[datetime.date] = None
+    cost: Optional[int] = None
+    name: Optional[str] = None
+    addr: Optional[str] = None
+    city: Optional[str] = None
+    area: Optional[str] = None
+    postcode: Optional[str] = None
+    country: Optional[str] = None
+    paymethod: Optional[str] = None
+    insurance: Optional[str] = None
 
 class pici(BaseModel):
-    ID: int
+    ID: Optional[int] = None
 
 class products(BaseModel):
-    ID: int
-    name: str
-    num: str
-    price: str
-    inventory: int
-    ordernum: int
-    reordernum: int
+    ID: Optional[int] = None
+    name: Optional[str] = None
+    num: Optional[str] = None
+    price: Optional[str] = None
+    inventory: Optional[int] = None
+    ordernum: Optional[int] = None
+    reordernum: Optional[int] = None
     supplystate: bool
 
 class proinfo(BaseModel):
-    piciID: int
-    productID: int 
-    prodate: datetime.date
-    expirationdate: datetime.date
+    piciID: Optional[int] = None
+    productID: Optional[int] = None 
+    prodate: Optional[datetime.date] = None
+    expirationdate: Optional[datetime.date] = None
 
 class rule(BaseModel):
-    id: int
-    weight: int
-    cost: str
-    cri: str
+    id: Optional[int] = None
+    weight: Optional[int] = None
+    cost: Optional[str] = None
+    cri: Optional[str] = None
 
 class shippers(BaseModel):
-    sID: int
-    sname: str
-    phone: str
-    tool: str
+    sID: Optional[int] = None
+    sname: Optional[str] = None
+    phone: Optional[str] = None
+    tool: Optional[str] = None
 
 class suppliers(BaseModel):
-    ID: int
-    name: str
-    pname: str
-    pjob: str
-    address: str
-    city: str
-    area: str
-    postcode: str
-    country: str
-    phone: str
-    fax: str
-    homepage: str
+    ID: Optional[int] = None
+    name: Optional[str] = None
+    pname: Optional[str] = None
+    pjob: Optional[str] = None
+    address: Optional[str] = None
+    city: Optional[str] = None
+    area: Optional[str] = None
+    postcode: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    fax: Optional[str] = None
+    homepage: Optional[str] = None
 
 class insertInfo(BaseModel):
-    tableName: str
+    tableName: Optional[str] = None
     categoryInput: category   #嵌套定义类，将外面的类引用到类内部，在内部也可以嵌套，但其他的函数引用内部类时麻烦
     customersInput: customers
     orderdetailInput: orderdetail
@@ -110,8 +113,7 @@ class insertInfo(BaseModel):
     ruleInput: rule
     shippersInput: shippers
     suppliersInput: suppliers
-    
 
-
-
+class countorderproduct(BaseModel):
+    orderid: int 
 
