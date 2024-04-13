@@ -4,6 +4,10 @@ import datetime
 
 # Optional[Optional[str] = None] = None
 
+class User(BaseModel):    
+    userName: str    
+    Id: int
+
 class tableInfo(BaseModel):
     tableName: Optional[str] = None
     id: Optional[int|str] = None
@@ -114,6 +118,5 @@ class insertInfo(BaseModel):
     shippersInput: shippers
     suppliersInput: suppliers
 
-class countorderproduct(BaseModel):
-    orderid: int 
+
 
