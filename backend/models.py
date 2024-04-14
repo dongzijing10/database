@@ -9,9 +9,9 @@ class User(BaseModel):
     Id: int
 
 class tableInfo(BaseModel):
-    tableName: Optional[str] = None
+    tablename: Optional[str] = None
     id: Optional[int|str] = None
-    id1: Optional[int] = None
+    id1: Optional[int|str] = None
 
 class category(BaseModel):
     id: Optional[str] = None
@@ -34,7 +34,7 @@ class customers(BaseModel):
     phone: Optional[str] = None
     fax: Optional[str] = None
     id: Optional[int] = None
-    password: Optional[str] = None
+    password: Optional[int] = None
 
 class orderdetail(BaseModel):
     orderid: Optional[int] = None 

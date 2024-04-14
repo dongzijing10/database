@@ -1,6 +1,9 @@
 import pymssql
 import models 
-
+import json
+import datetime 
+from decimal import Decimal  
+import base64
 
 connect = pymssql.connect(
     server = 'ZIJING-PC',
@@ -11,47 +14,59 @@ connect = pymssql.connect(
 )
 cursor = connect.cursor()
 
+def Convert(o):  
+    if isinstance(o, datetime.datetime):  
+        return o.__str__() 
+    elif isinstance(o, Decimal):  
+        return str(o)  # 或者 float(o)
+    elif isinstance(o, bytes):  
+        return base64.b64encode(o).decode('utf-8')  
+    raise TypeError(f'Object of type {o.__class__.__name__} is not JSON serializable')  
+  
 def GetInfo(info:models.tableInfo):
-    if(info.tableName == 'category'):
-        cursor.execute('select * from category where ID = %d',info.id)    
+    if(info.tablename == 'category'):
+        cursor.execute('select * from category where ID = %d',info.id)
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'customers'):
-        cursor.execute('select * from customers where cID = %s',info.id)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'customers'):
+        if(info.id1==0):
+            cursor.execute('select * from customers where cID = %s',(info.id))
+        else:
+            cursor.execute('select * from customers where cID = %s and password = %d',(info.id,info.id1))    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'orderdetail'):
-        cursor.execute('select * from customers where orderID = %d and productID = %d',info.id,info.id1)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'orderdetail'):
+        cursor.execute('select * from orderdetail where orderID = %d and productID = %d',(info.id,info.id1))    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'orders'):
-        cursor.execute('select * from customers where ID = %d',info.id)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'orders'):
+        cursor.execute('select * from orders where ID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'pici'):
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'pici'):
         cursor.execute('select * from pici where ID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'products'):
-        cursor.execute('select * from customers where ID = %d',info.id)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'products'):
+        cursor.execute('select * from products where ID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'proinfo'):
-        cursor.execute('select * from customers where piciID = %d and productID= %d',info.id,info.id1)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'proinfo'):
+        cursor.execute('select * from proinfo where piciID = %d and productID= %d',(info.id,info.id1))    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'rules'):
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'rules'):
         cursor.execute('select * from rules where ruleID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'shippers'):
-        cursor.execute('select * from customers where ID = %d',info.id)    
+            return json.dumps((row,))
+    elif(info.tablename == 'shippers'):
+        cursor.execute('select * from shippers where ID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
-    elif(info.tableName == 'suppliers'):
-        cursor.execute('select * from customers where ID = %d',info.id)    
+            return json.dumps((row,),default = Convert)
+    elif(info.tablename == 'suppliers'):
+        cursor.execute('select * from suppliers where ID = %d',info.id)    
         for row in cursor:
-            return('%s' % (row,))
+            return json.dumps((row,),default = Convert)
 
 def InsertCategory(info:models.category):
     cursor.execute('insert into category(ID,cname,explain,setup,updatetime) values(%d,%s,%s,%s,%s)',
@@ -59,7 +74,7 @@ def InsertCategory(info:models.category):
     connect.commit()
 
 def InsertCustomer(info:models.customers):#(cID,cname,pname,pjob,cadd,city,area,postcode,country,phone,fax,) 
-    cursor.execute('insert into customers values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s)',
+    cursor.execute('insert into customers values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d)',
                    (info.cID,info.cname,info.pname,info.pjob,info.caddress,info.city,info.area,info.postcode,info.country,info.phone,info.fax,info.id,info.password))
     connect.commit()
 
@@ -104,35 +119,73 @@ def InsertSuppliers(info:models.suppliers):#(ID,name,pname,pjob,address,city,are
     connect.commit()
 
 def RemoveInfo(info:models.tableInfo):
-    if(info.tableName == 'category'):
+    if(info.tablename == 'category'):
         cursor.execute('delete from category where ID = %d',info.id)
         connect.commit()
-    elif(info.tableName == 'customers'):
+    elif(info.tablename == 'customers'):
         cursor.execute('delete from customers where cID = %s',info.id)    
         connect.commit()    
-    elif(info.tableName == 'orderdetail'):
+    elif(info.tablename == 'orderdetail'):
         cursor.execute('delete from customers where orderID = %d and productID = %d',info.id,info.id1)
         connect.commit()    
-    elif(info.tableName == 'orders'):
+    elif(info.tablename == 'orders'):
         cursor.execute('delete from customers where ID = %d',info.id)    
         connect.commit()        
-    elif(info.tableName == 'pici'):
+    elif(info.tablename == 'pici'):
         cursor.execute('delete from pici where ID = %d',info.id)    
-    elif(info.tableName == 'products'):
+    elif(info.tablename == 'products'):
         cursor.execute('delete from customers where ID = %d',info.id)    
         connect.commit()        
-    elif(info.tableName == 'proinfo'):
+    elif(info.tablename == 'proinfo'):
         cursor.execute('delete from customers where piciID = %d and productID= %d',info.id,info.id1)    
         connect.commit()        
-    elif(info.tableName == 'rules'):
+    elif(info.tablename == 'rules'):
         cursor.execute('delete from rules where ruleID = %d',info.id)    
         connect.commit()        
-    elif(info.tableName == 'shippers'):
+    elif(info.tablename == 'shippers'):
         cursor.execute('delete from customers where ID = %d',info.id)    
         connect.commit()        
-    elif(info.tableName == 'suppliers'):
+    elif(info.tablename == 'suppliers'):
         cursor.execute('delete from customers where ID = %d',info.id)    
         connect.commit()       
+
+def GetProductsOfCategory(info:int):
+    cursor.execute('''
+        SELECT products.ID AS ptoduct_id,products.cname AS product_name,suppliers.sname As supplier_name, products.inventory,products.Price,products.num, category.cname
+            FROM  products   
+            INNER JOIN  category  ON products.cID = category.ID
+            JOIN suppliers ON products.sid = suppliers.ID
+            WHERE category.id = %d and products.supplystate = 0;
+    ''',info)
+    rows=()
+    for row in cursor:
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
+
+def GetAllProductsOfCategory():
+    cursor.execute('''
+        SELECT products.ID AS product_id,products.cname AS product_name,suppliers.sname As supplier_name, products.inventory,products.Price,products.num
+            FROM  products   
+            INNER JOIN  category  ON products.cID = category.ID
+            JOIN suppliers ON products.sid = suppliers.ID
+            WHERE  products.supplystate = 0
+			order by category.ID ASC
+    ''')
+    rows=()
+    for row in cursor:
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
+def GetProductsPictures(info:int):
+    cursor.execute('''
+        SELECT products.ID AS ptoduct_id,products.cname,category.cname,category.picture
+            FROM  products   
+            INNER JOIN  category  ON products.cID = category.ID  
+            WHERE category.id = %d and products.supplystate = 0;
+    ''',info)
+    rows=()
+    for row in cursor:
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
 
 def CountProductOfOrder(info:int):
     cursor.execute('''
@@ -143,12 +196,10 @@ def CountProductOfOrder(info:int):
                 where orderdetail.orderID = %d
 		        group by orderdetail.orderID, orders.orderdate,orders.oname,orders.addr
         ''',info)
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
 
 def CountOrderNumOfAreaAndCustomers():
     cursor.execute('''
@@ -158,12 +209,10 @@ def CountOrderNumOfAreaAndCustomers():
 			JOIN customers ON orders.cid=customers.cID
 			GROUP BY customers.cname,orders.area
         ''')
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def CountOrderNumOfArea():
     cursor.execute('''
@@ -172,12 +221,10 @@ def CountOrderNumOfArea():
             JOIN orderdetail ON orders.ID = orderdetail.orderID
 			GROUP BY orders.area
         ''')
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def CountOrderNumOfSeason():
     cursor.execute('''
@@ -201,12 +248,10 @@ def CountOrderNumOfSeason():
             ELSE '未知季节'  
         END;
         ''')
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def PriceOfProductsOfSuppliers():
     cursor.execute('''
@@ -215,12 +260,10 @@ def PriceOfProductsOfSuppliers():
         JOIN products  ON suppliers.ID= products.sid  
         ORDER BY  suppliers.ID ASC, products.ID ASC;
     ''') 
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def TotalMoneyOfSuppliers():
     cursor.execute('''
@@ -231,12 +274,10 @@ def TotalMoneyOfSuppliers():
         GROUP BY  suppliers.ID,suppliers.sname
         order by suppliers.ID ASC
     ''')
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def CountOrdersOfShippers():
     cursor.execute('''
@@ -246,12 +287,10 @@ def CountOrdersOfShippers():
         GROUP BY  shippers.ID, shippers.sname  
         ORDER BY  total_orders DESC;
     ''')
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 def CountOrdersOfSuppliers(info:int):
     cursor.execute('''
@@ -265,12 +304,10 @@ def CountOrdersOfSuppliers(info:int):
         GROUP BY category.ID, category.cname, suppliers.id, suppliers.sname 
         ORDER BY category.ID, suppliers.id;
     ''',info)
-    totaltuple=()
-    newtuple=()
+    rows=()
     for row in cursor:
-        newtuple=(row,)
-        totaltuple=newtuple+totaltuple
-    return totaltuple
+        rows+=(row,)
+    return json.dumps(rows)
 
 
 # cursor.close()    

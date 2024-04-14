@@ -69,6 +69,18 @@ async def InsertSuppliers(info:models.suppliers):
 async def Remove(info:models.tableInfo):
     return SqlOperation.RemoveInfo(info)
 
+@app.post("/GetProductsOfCategory/")
+async def GetProductsOfCategory(CategoryID:int):
+    return SqlOperation.GetProductsOfCategory(CategoryID)
+
+@app.get("/GetAllProductsOfCategory/")
+async def GetAllProductsOfCategory():
+    return SqlOperation.GetAllProductsOfCategory()
+
+@app.post("/GetProductsPictures/")
+async def GetProductsPictures(CategoryID:int):
+    return SqlOperation.GetProductsPictures(CategoryID)
+
 @app.post("/CountProductsOforder")
 async def CountProductsOforder(orderID:int):
     return SqlOperation.CountProductOfOrder(orderID)
