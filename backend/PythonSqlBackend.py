@@ -1,8 +1,8 @@
-import SqlOperation
 import models 
+import SqlOperation
+from typing import Any
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Any
 
 #uvicorn PythonSqlBackend:app --reload
 
@@ -77,9 +77,9 @@ async def GetProductsOfCategory(CategoryID:int):
 async def GetAllProductsOfCategory():
     return SqlOperation.GetAllProductsOfCategory()
 
-@app.post("/GetProductsPictures/")
-async def GetProductsPictures(CategoryID:int):
-    return SqlOperation.GetProductsPictures(CategoryID)
+@app.post("/GetPicturesofProducts/")
+async def  GetPicturesofProducts(CategoryID:int):
+    return SqlOperation. GetPicturesofProducts(CategoryID)
 
 @app.post("/CountProductsOforder")
 async def CountProductsOforder(orderID:int):

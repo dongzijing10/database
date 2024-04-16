@@ -1,9 +1,9 @@
-import pymssql
-import models 
 import json
+import models 
+import base64
+import pymssql
 import datetime 
 from decimal import Decimal  
-import base64
 
 connect = pymssql.connect(
     server = 'ZIJING-PC',
@@ -12,6 +12,7 @@ connect = pymssql.connect(
     database = 'test',
     as_dict = True
 )
+
 cursor = connect.cursor()
 
 def Convert(o):  
@@ -21,8 +22,8 @@ def Convert(o):
         return str(o)  # 或者 float(o)
     elif isinstance(o, bytes):  
         return base64.b64encode(o).decode('utf-8')  
-    raise TypeError(f'Object of type {o.__class__.__name__} is not JSON serializable')  
-  
+    # raise TypeError(f'Object of type {o.__class__.__name__} is not JSON serializable')  
+
 def GetInfo(info:models.tableInfo):
     if(info.tablename == 'category'):
         cursor.execute('select * from category where ID = %d',info.id)
@@ -175,17 +176,19 @@ def GetAllProductsOfCategory():
     for row in cursor:
         rows+=(row,)
     return json.dumps(rows,default = Convert)
-def GetProductsPictures(info:int):
+
+def GetPicturesofProducts(info:int):
     cursor.execute('''
-        SELECT products.ID AS ptoduct_id,products.cname,category.cname,category.picture
+        SELECT products.id AS product_id,products.cname AS products_name,category.cname as category_name,category.base64_img
             FROM  products   
             INNER JOIN  category  ON products.cID = category.ID  
             WHERE category.id = %d and products.supplystate = 0;
     ''',info)
     rows=()
     for row in cursor:
+        # b = bytes(row['picture'], 'utf-8').decode('unicode_escape').encode('latin1')
         rows+=(row,)
-    return json.dumps(rows,default = Convert)
+    return rows
 
 def CountProductOfOrder(info:int):
     cursor.execute('''
@@ -224,6 +227,7 @@ def CountOrderNumOfArea():
     rows=()
     for row in cursor:
         rows+=(row,)
+    print(rows)
     return json.dumps(rows)
 
 def CountOrderNumOfSeason():
@@ -251,6 +255,7 @@ def CountOrderNumOfSeason():
     rows=()
     for row in cursor:
         rows+=(row,)
+    print(rows)
     return json.dumps(rows)
 
 def PriceOfProductsOfSuppliers():
