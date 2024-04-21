@@ -3,7 +3,7 @@ import base64
 import io
  
 # Open an image file
-with Image.open(r'D:\dongzijing\桌面\鱼.png') as img:
+with Image.open(r"D:\dongzijing\桌面\product_picture\01.png") as img:
     # Convert image to bytes
     image_format = img.format
     byte_arr = io.BytesIO()
@@ -30,7 +30,7 @@ with open('convert_base64.txt', 'w') as f:
 image = Image.open(io.BytesIO(img_binary))
  
 # Display image
-image.show()
+# image.show()
   
 
 

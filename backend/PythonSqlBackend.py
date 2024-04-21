@@ -25,50 +25,6 @@ async def GetData(user: models.User):
 async def GetInfo(info:models.tableInfo):
     return SqlOperation.GetInfo(info)
 
-@app.post("/InsertCategory/")
-async def InsertCategory(info:models.category):
-    return SqlOperation.InsertCategory(info)
-
-@app.post("/InsertCustomers/")
-async def InsertCustomers(info:models.customers):
-    return SqlOperation.InsertCustomer(info)
-
-@app.post("/InsertOrderDetail/")
-async def InsertOrderDetail(info:models.orderdetail):
-    return SqlOperation.InsertOrderDetail(info)
-
-@app.post("/InsertOrder/")
-async def InsertOrder(info:models.orders):
-    return SqlOperation.InsertOrder(info)
-
-@app.post("/InsertPici/")
-async def InsertPici(info:models.pici):
-    return SqlOperation.InsertPici(info)
-
-@app.post("/InsertProducts/")
-async def InsertProducts(info:models.products):
-    return SqlOperation.InsertProducts(info)
-
-@app.post("/InsertProinfo/")
-async def InsertProinfo(info:models.category):
-    return SqlOperation.InsertCategory(info)
-
-@app.post("/InsertRule/")
-async def InsertRule(info:models.rule):
-    return SqlOperation.InsertRules(info)
-
-@app.post("/InsertShippers/")
-async def InsertShippers(info:models.shippers):
-    return SqlOperation.InsertShippers(info)
-
-@app.post("/InsertSuppliers/")
-async def InsertSuppliers(info:models.suppliers):
-    return SqlOperation.InsertSuppliers(info)
-
-@app.post("/Remove")
-async def Remove(info:models.tableInfo):
-    return SqlOperation.RemoveInfo(info)
-
 @app.post("/GetProductsOfCategory/")
 async def GetProductsOfCategory(CategoryID:int):
     return SqlOperation.GetProductsOfCategory(CategoryID)
@@ -81,13 +37,13 @@ async def GetAllProductsOfCategory():
 async def  GetPicturesofProducts(CategoryID:int):
     return SqlOperation. GetPicturesofProducts(CategoryID)
 
-@app.post("/CountProductsOforder")
-async def CountProductsOforder(orderID:int):
-    return SqlOperation.CountProductOfOrder(orderID)
-
-@app.get("/CountProductsNumOfAreaAndCustomers")
+@app.get("/CountOrderNumOfAreaAndCustomers")
 async def CountOrderNumOfAreaAndCustomers():
     return SqlOperation.CountOrderNumOfAreaAndCustomers()
+
+@app.get("/CountOrderNumOfAreaAndCustomers1")
+async def CountOrderNumOfAreaAndCustomers1():
+    return SqlOperation.CountOrderNumOfAreaAndCustomers1()
 
 @app.get("/CountOrderNumOfArea/")
 async def CountOrderNumOfArea():
@@ -110,8 +66,34 @@ async def CountOrdersOfShippers():
     return SqlOperation.CountOrdersOfShippers()
 
 @app.post("/CountOrdersOfSuppliers/")
-async def CountOrdersOfSuppliers(categoryID:int):
-    return SqlOperation.CountOrdersOfSuppliers(categoryID)
+async def CountOrdersOfSuppliers(CategoryID:int):
+    return SqlOperation.CountOrdersOfSuppliers(CategoryID)
 
-
+@app.post("/RegisterCustomer/")
+async def RegisterCustomer(info:models.register_customer):
+    return SqlOperation.RegisterCustomer(info)
          
+@app.post("/UpdateCustomer/")
+async def UpdateCustomer(info:models.customers1):
+    return SqlOperation.UpdateCustomer(info)
+
+@app.post("/CreateOrder/")
+async def CreateOrder(info:models.orders):
+    return SqlOperation.CreateOrder(info)
+
+@app.post("/CreateOrderDetail/")
+async def CreateOrderDetail(info:models.orderdetail):
+    return SqlOperation.CreateOrderDetail
+
+@app.post("/CreateOrderAndDetail/")
+async def CreateOrderAndDetail(info:models.orders,info1:models.orderdetail):
+    return SqlOperation.CreateOrderAndDetail(info,info1)
+
+@app.post("/GetOrderDetails/")
+async def GetOrderDetails(info:int):
+    return SqlOperation.GetOrderDetails(info)
+
+@app.post("/FuzzyQuery/")
+async def FuzzyQuery(info:str):
+    return SqlOperation.FuzzyQuery(info)
+    

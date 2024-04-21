@@ -69,90 +69,69 @@ def GetInfo(info:models.tableInfo):
         for row in cursor:
             return json.dumps((row,),default = Convert)
 
-def InsertCategory(info:models.category):
-    cursor.execute('insert into category(ID,cname,explain,setup,updatetime) values(%d,%s,%s,%s,%s)',
-                   (info.id,info.cname,info.explain,info.setup,info.update))
-    connect.commit()
-
-def InsertCustomer(info:models.customers):#(cID,cname,pname,pjob,cadd,city,area,postcode,country,phone,fax,) 
+def RegisterCustomer(info:models.register_customer):
     cursor.execute('insert into customers values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d)',
-                   (info.cID,info.cname,info.pname,info.pjob,info.caddress,info.city,info.area,info.postcode,info.country,info.phone,info.fax,info.id,info.password))
+                   (info.id,'s','s','s','s','s','s','s','s','s','s',0,info.password))
+    connect.commit()
+    return {"result": 'success'}
+
+def UpdateCustomer(info:models.customers1):
+    cursor.execute('''UPDATE  customers  SET cname = %s, pname = %s, pjob = %s, caddress = %s,city = %s, 
+                   area = %s,postcode = %s, country = %s,phone = %s, fax = %s
+                   WHERE cid = %s;
+                   ''',(info.cname,info.pname,info.pjob,info.caddress,info.city,info.area,info.postcode,info.country,info.phone,info.fax,info.cID))
     connect.commit()
 
-def InsertOrderDetail(info:models.orderdetail):#(orderID,productID,num,remark)
-    cursor.execute('insert into orderdetail values(%d,%d,%d,%s)',
-                   (info.orderid,info.productid,info.num,info.remark))
+def CreateOrder(info:models.orders):
+    cursor.execute('select max(id) as max_id from orders')
+    max_id = cursor.fetchone()['max_id']
+    cursor.execute('insert into orders values(%d,%s,%d,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%d)',
+                   (max_id + 1,info.customerID,info.employeeID,info.orderdate,info.starttime,info.arrivaltime,'',0,
+                    info.name,info.addr,info.city,info.area,info.postcode,info.country,info.paymethod,info.insurance))
     connect.commit()
 
-def InsertOrder(info:models.orders):#(ID,orderdate,starttime,arrivaltime,confirmtime,cost,name,addr,city,area,postcode,paymethon,insurance)
-    cursor.execute('insert into orders values(%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d)',
-                   (info.ID,info.customerID,info.employeeID,info.orderdate,info.starttime,info.arrivaltime,info.confirmtime,
-                    info.cost,info.name,info.addr,info.city,info.area,info.postcode,info.country,info.paymethod,info.insurance))
+def CreateOrderDetail(info:models.orderdetail):
+    cursor.execute('select max(id) as max_id from orders')
+    max_id = cursor.fetchone()['max_id']
+    cursor.execute('insert into orderdetail values(%d,%d,%d,%s)',max_id,info.productid,info.num,' ')
     connect.commit()
 
-def InsertPici(info:models.pici):
-    cursor.execute('insert into pici values(%d)',(info.piciInput.ID))
+def CreateOrderAndDetail(info:models.orders,info1:models.orderdetail):
+    cursor.execute('select max(id) as max_id from orders')
+    max_id = cursor.fetchone()['max_id']            #找到当前最大的订单号码
+
+    cursor.execute('insert into orders values(%d,%s,%d,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s,%s,%d)',
+                   (max_id + 1,info.customerID,info.employeeID,info.orderdate,info.starttime,info.arrivaltime,info.orderdate,0,
+                    info.name,info.addr,info.city,info.area,info.postcode,info.country,info.paymethod,info.insurance))
     connect.commit()
 
-def InsertProducts(info:models.products):#(ID,name,num,price,inventory,ordernum,reordernum,supplystate)
-    cursor.execute('insert into products values(%d,%s,%s,%d,%d,%d,%d,%s)',
-                   (info.ID,info.name,info.num,info.price,info.inventory,info.ordernum,info.reordernum,info.supplystate))
+    cursor.execute('insert into orderdetail values(%d,%d,%d,%s)',(max_id + 1,info1.productid,info1.num,' '))
     connect.commit()
 
-def InsertProinfo(info:models.proinfo):#(ID,productID,prodate,expiration)
-    cursor.execute('insert into proinfo values(%d,%d,%s,%s)',
-                   (info.piciID,info.productID,info.prodate,info.expirationdate))
+    cursor.execute('update products set inventory = inventory - %d where id = %d',(info1.num,info1.productid))
+    cursor.execute('''
+        UPDATE orders  
+        SET orders.delivercost = ( 
+            SELECT tq.total_quantity * rules.criterion    
+            FROM (    
+                SELECT od.orderID AS orders_ID, SUM(od.num) as total_quantity    
+                FROM orderdetail od      
+                GROUP BY od.orderID    
+            ) tq    
+            JOIN rules ON tq.total_quantity BETWEEN rules.weight AND rules.weight1    
+            WHERE tq.orders_ID = orders.ID   
+            --LIMIT 1 -- 假设每个订单只匹配一个criterion,但这通常不是一个好的做法  
+        )   WHERE EXISTS (    
+            SELECT 1    
+            FROM orderdetail od    
+            WHERE od.orderID = orders.ID  and orders.id = %d 
+            );
+        ''',max_id + 1)
     connect.commit()
-
-def InsertRules(info:models.rule):#(ruleID,weight,cost,criterion)
-    cursor.execute('insert into rules values(%d,%d,%d,%d)',
-                   (info.ruleInput.id,info.ruleInput.weight,info.ruleInput.cost,info.ruleInput.cri))
-    connect.commit()
-
-def InsertShippers(info:models.shippers):#(sID,sname,phone,tool)
-    cursor.execute('insert into shippers values(%d,%s,%s,%s)',
-                   (info.sID,info.sname,info.phone,info.tool))
-    connect.commit()
-
-def InsertSuppliers(info:models.suppliers):#(ID,name,pname,pjob,address,city,area,postcode,country,phone,fax,homepage)
-    cursor.execute('insert into suppliers values(%d,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',
-                   (info.ID,info.name,info.pname,info.pjob,info.address,info.city,info.area,info.postcode,info.country,info.phone,info.fax,info.homepage))
-    connect.commit()
-
-def RemoveInfo(info:models.tableInfo):
-    if(info.tablename == 'category'):
-        cursor.execute('delete from category where ID = %d',info.id)
-        connect.commit()
-    elif(info.tablename == 'customers'):
-        cursor.execute('delete from customers where cID = %s',info.id)    
-        connect.commit()    
-    elif(info.tablename == 'orderdetail'):
-        cursor.execute('delete from customers where orderID = %d and productID = %d',info.id,info.id1)
-        connect.commit()    
-    elif(info.tablename == 'orders'):
-        cursor.execute('delete from customers where ID = %d',info.id)    
-        connect.commit()        
-    elif(info.tablename == 'pici'):
-        cursor.execute('delete from pici where ID = %d',info.id)    
-    elif(info.tablename == 'products'):
-        cursor.execute('delete from customers where ID = %d',info.id)    
-        connect.commit()        
-    elif(info.tablename == 'proinfo'):
-        cursor.execute('delete from customers where piciID = %d and productID= %d',info.id,info.id1)    
-        connect.commit()        
-    elif(info.tablename == 'rules'):
-        cursor.execute('delete from rules where ruleID = %d',info.id)    
-        connect.commit()        
-    elif(info.tablename == 'shippers'):
-        cursor.execute('delete from customers where ID = %d',info.id)    
-        connect.commit()        
-    elif(info.tablename == 'suppliers'):
-        cursor.execute('delete from customers where ID = %d',info.id)    
-        connect.commit()       
-
+    
 def GetProductsOfCategory(info:int):
     cursor.execute('''
-        SELECT products.ID AS ptoduct_id,products.cname AS product_name,suppliers.sname As supplier_name, products.inventory,products.Price,products.num, category.cname
+        SELECT products.ID AS product_id,products.cname AS product_name,suppliers.sname As supplier_name, products.inventory,products.Price,products.num, category.cname
             FROM  products   
             INNER JOIN  category  ON products.cID = category.ID
             JOIN suppliers ON products.sid = suppliers.ID
@@ -179,7 +158,7 @@ def GetAllProductsOfCategory():
 
 def GetPicturesofProducts(info:int):
     cursor.execute('''
-        SELECT products.id AS product_id,products.cname AS products_name,category.cname as category_name,category.base64_img
+        SELECT products.id AS product_id,products.cname AS products_name,category.cname as category_name, products.picture_base64 AS base64_img
             FROM  products   
             INNER JOIN  category  ON products.cID = category.ID  
             WHERE category.id = %d and products.supplystate = 0;
@@ -188,25 +167,36 @@ def GetPicturesofProducts(info:int):
     for row in cursor:
         # b = bytes(row['picture'], 'utf-8').decode('unicode_escape').encode('latin1')
         rows+=(row,)
-    return rows
+    return json.dumps(rows,default = Convert)
 
-def CountProductOfOrder(info:int):
+def GetOrderDetails(info:int):
     cursor.execute('''
-        SELECT orderdetail.orderID,orders.orderdate,orders.oname,orders.addr,sum(products.price*orderdetail.num) as totalcost
-            FROM products
-            JOIN orderdetail ON products.ID = orderdetail.productID  
-			JOIN orders ON orders.ID = orderdetail.orderID
-                where orderdetail.orderID = %d
-		        group by orderdetail.orderID, orders.orderdate,orders.oname,orders.addr
+        SELECT  od.orderID, p.ID AS productID,  p.cname AS productName,  p.num,  od.num AS quantity,  p.price,  (p.price * od.num) AS subtotal,  o.orderdate, o.oname AS OwnerName,  o.addr AS address,  
+            (SELECT SUM(op.price * odp.num)  
+            FROM products op  
+            JOIN orderdetail odp ON op.ID = odp.productID  
+            WHERE odp.orderID = od.orderID) AS totalOrderCost 
+        FROM  products p  
+        JOIN  orderdetail od ON p.ID = od.productID  
+        JOIN  orders o ON o.ID = od.orderID  
+        WHERE od.orderID = %d; 
         ''',info)
     rows=()
     for row in cursor:
         rows+=(row,)
     return json.dumps(rows,default = Convert)
 
-def CountOrderNumOfAreaAndCustomers():
+def FuzzyQuery(info:int):
+    target = info+'%'
+    cursor.execute('select * from orders where ID like %s',target)
+    rows=()
+    for row in cursor:
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
+
+def CountOrderNumOfAreaAndCustomers1():
     cursor.execute('''
-         SELECT orders.area, customers.cname,  SUM(orderdetail.num) AS total_num  
+         SELECT orders.area, customers.cname, SUM(orderdetail.num) AS total_num  
             FROM orders  
             JOIN orderdetail ON orders.ID = orderdetail.orderID
 			JOIN customers ON orders.cid=customers.cID
@@ -215,20 +205,33 @@ def CountOrderNumOfAreaAndCustomers():
     rows=()
     for row in cursor:
         rows+=(row,)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
 
-def CountOrderNumOfArea():
+def CountOrderNumOfAreaAndCustomers():
     cursor.execute('''
          SELECT orders.area, SUM(orderdetail.num) AS total_num  
             FROM orders  
             JOIN orderdetail ON orders.ID = orderdetail.orderID
+			JOIN customers ON orders.cid=customers.cID
 			GROUP BY orders.area
         ''')
     rows=()
     for row in cursor:
         rows+=(row,)
-    print(rows)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
+
+def CountOrderNumOfArea():
+    cursor.execute('''
+         SELECT suppliers.area, SUM(orderdetail.num) AS total_num 
+	        FROM suppliers   
+	        JOIN products ON suppliers.ID = products.sid  
+	        JOIN orderdetail ON products.ID = orderdetail.productID  
+	        GROUP BY suppliers.area;
+        ''')
+    rows=()
+    for row in cursor:
+        rows+=(row,)
+    return json.dumps(rows,default = Convert)
 
 def CountOrderNumOfSeason():
     cursor.execute('''
@@ -256,7 +259,7 @@ def CountOrderNumOfSeason():
     for row in cursor:
         rows+=(row,)
     print(rows)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
 
 def PriceOfProductsOfSuppliers():
     cursor.execute('''
@@ -268,7 +271,7 @@ def PriceOfProductsOfSuppliers():
     rows=()
     for row in cursor:
         rows+=(row,)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
 
 def TotalMoneyOfSuppliers():
     cursor.execute('''
@@ -282,7 +285,7 @@ def TotalMoneyOfSuppliers():
     rows=()
     for row in cursor:
         rows+=(row,)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
 
 def CountOrdersOfShippers():
     cursor.execute('''
@@ -295,11 +298,11 @@ def CountOrdersOfShippers():
     rows=()
     for row in cursor:
         rows+=(row,)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
 
 def CountOrdersOfSuppliers(info:int):
     cursor.execute('''
-        SELECT category.ID, category.cname, suppliers.ID, suppliers.sname, SUM(orderdetail.num) AS total_quantity_supplied 
+        SELECT category.ID, category.cname, suppliers.ID, suppliers.sname, SUM(orderdetail.num) AS total_quantity
         FROM  category   
         JOIN  products  ON category.ID = products.cID  
         JOIN  orderdetail  ON products.id = orderdetail.productid  
@@ -312,7 +315,8 @@ def CountOrdersOfSuppliers(info:int):
     rows=()
     for row in cursor:
         rows+=(row,)
-    return json.dumps(rows)
+    return json.dumps(rows,default = Convert)
+
 
 
 # cursor.close()    

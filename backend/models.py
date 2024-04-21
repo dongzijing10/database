@@ -36,21 +36,38 @@ class customers(BaseModel):
     id: Optional[int] = None
     password: Optional[int] = None
 
+class customers1(BaseModel):
+    cID: str
+    cname: Optional[str] = None
+    pname: Optional[str] = None
+    pjob: Optional[str] = None
+    caddress: Optional[str] = None
+    city: Optional[str] = None
+    area: Optional[str] = None
+    postcode: Optional[str] = None
+    country: Optional[str] = None
+    phone: Optional[str] = None
+    fax: Optional[str] = None
+
+class register_customer(BaseModel):
+    id: str
+    password: int
+
 class orderdetail(BaseModel):
-    orderid: Optional[int] = None 
+    # orderid: Optional[int] = None 
     productid: Optional[int] = None
     num: Optional[int] = None
-    remark: Optional[str] = None
+    # remark: Optional[str] = None
 
 class orders(BaseModel):
-    ID: Optional[int] = None
+    # ID: Optional[int] = None
     customerID: Optional[str] = None
     employeeID: Optional[int] = None
     orderdate: Optional[datetime.date] = None
     starttime: Optional[datetime.date] = None
     arrivaltime: Optional[datetime.date] = None
-    confirmtime: Optional[datetime.date] = None
-    cost: Optional[int] = None
+    # confirmtime: Optional[datetime.date] = None
+    # deliver_cost: Optional[int] = None
     name: Optional[str] = None
     addr: Optional[str] = None
     city: Optional[str] = None
@@ -58,7 +75,7 @@ class orders(BaseModel):
     postcode: Optional[str] = None
     country: Optional[str] = None
     paymethod: Optional[str] = None
-    insurance: Optional[str] = None
+    insurance: Optional[int] = None
 
 class pici(BaseModel):
     ID: Optional[int] = None
