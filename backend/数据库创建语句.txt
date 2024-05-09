@@ -44,7 +44,8 @@ Create table category(
     	explain ntext,
 	picture image,
 	setup datetime not NULL,
-	updatetime datetime not NULL
+	updatetime datetime not NULL,
+	base64_img nvarchar(MAX)
 )
 
 --4.供应商
@@ -76,11 +77,10 @@ Create table products(
 	reordernum  smallint,
 	supplystate bit not NULL
 	sid int not NULL,
-	cid int not NULL
+	cid int not NULL,
+	picture_base64 nvarchar(MAX),
 	foreign key(sID) references suppliers(ID),
 	foreign key(cID) references cateory(ID),
-
-
 )
 
 

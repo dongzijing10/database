@@ -70,8 +70,8 @@ def GetInfo(info:models.tableInfo):
             return json.dumps((row,),default = Convert)
 
 def RegisterCustomer(info:models.register_customer):
-    cursor.execute('insert into customers values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%d)',
-                   (info.id,'s','s','s','s','s','s','s','s','s','s',0,info.password))
+    cursor.execute('insert into customers values(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d)',
+                   (info.id,'s','s','s','s','s','s','s','s','s','s',info.password))
     connect.commit()
     return {"result": 'success'}
 
@@ -172,7 +172,7 @@ def GetPicturesofProducts(info:int):
 def GetOrderDetails(info:int):
     cursor.execute('''
         SELECT  od.orderID, p.ID AS productID,  p.cname AS productName,  p.num,  od.num AS quantity,  p.price,  (p.price * od.num) AS subtotal,  o.orderdate, o.oname AS OwnerName,  o.addr AS address,  
-            (SELECT SUM(op.price * odp.num)  
+            (SELECT SUM(op.price * odp.num) + o.delivercost 
             FROM products op  
             JOIN orderdetail odp ON op.ID = odp.productID  
             WHERE odp.orderID = od.orderID) AS totalOrderCost 
